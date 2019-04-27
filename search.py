@@ -39,7 +39,7 @@ def bingSearch(arrayvars,numberOfPages):
             y = re.match("(.*go.microsoft.*)" ,(link.get('href')))
             # get links that are in anchors with hrefences
             z = re.match("(http[s]*:\/\/[www]*).*",(link.get('href')))
-            if z and not y :
+            if  z and not y :
                 cleanLinks.append((link.get('href')))
         urls.extend(cleanLinks)
     urls = list(set(urls))
