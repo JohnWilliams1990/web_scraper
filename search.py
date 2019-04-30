@@ -12,7 +12,7 @@ import requests
 import bs4
 import re
 import urllib.request as urllib2
-
+import subprocess
 # bingSearch(arrayvars,numberOfPages)
 # Function used to search bing for applicable urls for the serrch terms that are provided. 
 # variables: 
@@ -21,6 +21,9 @@ import urllib.request as urllib2
 # numberOfPages -> How many bing pages should be searched. This will amplify the number of 
 #                  URLs that are returned
 # returns: List of URLs from the bing pages
+
+import signal
+
 
 def bingSearch(arrayvars,numberOfPages):
     urls = []
@@ -72,11 +75,73 @@ def getContent(url):
         print ("# DESCRIPTION: " + str(result.find('p')).replace(" ", " "))
         print ("# ___________________________________________________________\n#")
 
-if __name__ == '__main__':
 
+def textFilter(terms, website):
+    count = 0
+    try:
+        html = requests.get(website).content
+        unicodeStr = html.decode("utf8")
+        encodedStr = unicodeStr.encode("ascii",'ignore')
+        newsSoup = bs4.BeautifulSoup(encodedStr, "html.parser")
+        aText = newsSoup.find_all('p')
+        #2 Removing
+        strings = [re.sub(r'<.+?>',r'',str(a)) for a in aText]
+    except:
+       return -1
+    for word in terms: 
+        pattern = re.compile(word, re.IGNORECASE)
+        #print(pattern.findall(" ".join(strings)))
+        if (len(pattern.findall(" ".join(strings))) < 2):
+          count -=1
+        else:
+          count +=1
+    if count > 2 and vvv : 
+        print (" ".join(strings))
+    return count
+
+def keyboardInterruptHandler(signal, frame):    
+    subprocess.run('''
+      for i in `ps -ef | grep search.py | awk '{print $2}'`; do 
+        kill $i 
+      done''',
+    shell=True, check=True,
+    executable='/bin/bash')
+    output, error = process.communicate()
+    sys.exit(0)
+
+if __name__ == '__main__':
     # sys.argv[1:] search terms are all listed in the array except for the first term
+    signal.signal(signal.SIGINT, keyboardInterruptHandler)
     urls1 = [] # list of urls
     numberOfPages = 5 # pages in bing to traverse
+    length = len(sys.argv)
+    v = False
+    vv = False
+    vvv = False
+    #try:
+    if '-v' in sys.argv: 
+        sys.argv.remove("-v")
+        v = True
+    elif '-vv' in sys.argv:
+        sys.argv.remove("-vv")
+        vv = True
+    elif '-vvv' in sys.argv:
+        sys.argv.remove("-vvv")
+        vvv = True
+        numberOfPages = 10 # pages in bing to traverse
+    #except: pass
+
     urls1 =  bingSearch(sys.argv[1:], numberOfPages)
-    for link in urls1: 
-        print(link)
+    #if (length > len(sys.argv)): 
+    if ( v  or vvv ): 
+        for link in urls1: 
+            print(link)
+            if (textFilter(sys.argv[1:], link) < 0): 
+                #print(link + " is not applicable")
+                pass
+            else:
+                print(link)
+    else: 
+        for link in urls1: 
+            print(link)
+
