@@ -2,6 +2,7 @@ from html.parser import HTMLParser
 import re
 import json
 import sys
+import requests
 
 VERBOSE = False
 
@@ -112,16 +113,28 @@ def json_to_seeker(data):
     return seekers
 
 
-with open(sys.argv[1], 'r') as file:
-    html_data = file.read()
 
-with open(sys.argv[2]) as json_file:
-    json_data = json.load(json_file)
+if __name__ == '__main__':
+
+    try: 
+
+        html_data = requests.get(sys.argv[1]).content
+        unicodeStr = html_data.decode("utf8")
+        with open(sys.argv[2]) as json_file:
+            json_data = json.load(json_file)
+        
+
+        seekers = json_to_seeker(json_data)
+        parser = CustomParser(seekers)
+        #parser.feed(html_data)
+        parser.feed(unicodeStr)
+        parser.checkSeekers()
+    except: 
+        pass
+
     
-seekers = json_to_seeker(json_data)
 
-parser = CustomParser(seekers)
 
-parser.feed(html_data)
-parser.checkSeekers()
+
+
 

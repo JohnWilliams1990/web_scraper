@@ -13,6 +13,7 @@ import bs4
 import re
 import urllib.request as urllib2
 import subprocess
+
 # bingSearch(arrayvars,numberOfPages)
 # Function used to search bing for applicable urls for the serrch terms that are provided. 
 # variables: 
@@ -144,4 +145,12 @@ if __name__ == '__main__':
     else: 
         for link in urls1: 
             print(link)
+            try: 
+                process = subprocess.run('python3 Cyber_Parser.py "' + link + '" example_json.json',
+                shell=True, check=True,
+                executable='/bin/bash')
+                print()
+            except: 
+                pass
+
 
